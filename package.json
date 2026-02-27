@@ -1,0 +1,20 @@
+{
+  "name": "webmcp-distributed-observer",
+  "version": "1.0.0",
+  "description": "WebMCP Controlled Distributed Web Observability Harness",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start:coordinator": "node coordinator/coordinator.js",
+    "start:worker": "node worker/worker.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "chalk": "^5.6.2",
+    "express": "^5.2.1",
+    "playwright": "^1.58.2",
+    "ws": "^8.19.0"
+  }
+}

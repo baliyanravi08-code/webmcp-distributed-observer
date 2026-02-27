@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Distributed Harness</title>
+
+  <style>
+    body {
+      background:#0b0b0b;
+      color:white;
+      font-family:Arial;
+      padding:30px;
+    }
+
+    button{
+      padding:10px 18px;
+      margin-right:10px;
+      font-size:16px;
+      cursor:pointer;
+    }
+
+    #status{
+      margin-top:20px;
+      background:#222;
+      padding:20px;
+    }
+  </style>
+</head>
+
+<body>
+
+<h1>🧠 Distributed Harness (Realtime)</h1>
+
+<button onclick="run()">RUN</button>
+<button onclick="pause()">PAUSE</button>
+<button onclick="resume()">RESUME</button>
+
+<div id="status">
+Waiting realtime data...
+</div>
+
+<script>
+
+/* ===============================
+   CONNECT DASHBOARD WS
+================================= */
+
+const ws = new WebSocket("ws://localhost:9090");
+
+ws.onopen = () => {
+  console.log("✅ Dashboard WS Connected");
+};
+
+ws.onerror = () => {
+  console.log("❌ WS ERROR");
+};
+
+ws.onclose = () => {
+  console.log("⚠ WS Closed");
+};
+
+ws.onmessage = (event) => {
+
+  const data = JSON.parse(event.data);
+
+  document.getElementById("status").innerHTML = `
+    <h3>📊 SYSTEM STATUS</h3>
+
+    Workers Active: ${data.workersActive}<br/>
+    Busy: ${data.busy}<br/>
+    Idle: ${data.idle}<br/>
+    Tasks Sent: ${data.tasksSent}
+  `;
+};
+
+/* buttons (optional) */
+function run(){}
+function pause(){}
+function resume(){}
+
+</script>
+
+</body>
+</html>
