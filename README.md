@@ -1,22 +1,89 @@
 # 🧠 WebMCP Distributed Autonomous Web Observability Harness
 
+![Node.js](https://img.shields.io/badge/Node.js-Distributed-green)
+![Playwright](https://img.shields.io/badge/Playwright-Automation-blue)
+![Architecture](https://img.shields.io/badge/Architecture-Control--Plane-orange)
+
 A **distributed, self-healing Playwright automation infrastructure** designed to continuously monitor live web trading interfaces using autonomous browser workers.
 
-This project demonstrates **Automation Infrastructure Engineering**, moving beyond traditional test automation into **distributed orchestration, realtime observability, and autonomous execution systems**.
+This project demonstrates **Automation Infrastructure Engineering**, moving beyond traditional test automation into:
+
+* Distributed orchestration
+* Autonomous browser execution
+* Realtime observability
+* Control-plane driven automation systems
 
 ---
 
 ## 🚀 Project Vision
 
-Modern QA systems should behave like **platform infrastructure**, not test suites.
+Modern QA platforms should behave like **engineering infrastructure**, not test scripts.
 
-This project implements:
+This system implements:
 
 ✅ Distributed browser workers
 ✅ Centralized control plane
 ✅ Autonomous task scheduling
 ✅ Live observability dashboard
 ✅ Self-healing execution model
+
+---
+
+## ⚡ Quick Start (Run Locally)
+
+Clone repository:
+
+```bash
+git clone https://github.com/baliyanravi08-code/webmcp-distributed-observer.git
+cd webmcp-distributed-observer
+```
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Install Playwright browsers:
+
+```bash
+npx playwright install
+```
+
+Start Coordinator:
+
+```bash
+npm run start:coordinator
+```
+
+Start Worker (open new terminal):
+
+```bash
+npm run start:worker
+```
+
+Start additional workers (optional):
+
+```bash
+npm run start:worker
+npm run start:worker
+```
+
+Open dashboard:
+
+```
+http://localhost:3000
+```
+
+---
+
+## ✅ Requirements
+
+* Node.js ≥ 18
+* npm ≥ 9
+* Windows / macOS / Linux
+
+⚠️ Playwright browsers must be installed before running workers.
 
 ---
 
@@ -71,22 +138,22 @@ Realtime Dashboard Updates
 ### 🧱 Distributed Harness Execution
 
 * Multiple autonomous Playwright workers
-* Horizontal execution model
-* Independent browser agents
-* Persistent single-tab execution
+* Horizontal scaling model
+* Persistent single-tab browser agents
+* Independent execution lifecycle
 
 ---
 
 ### 🧠 Coordinator Control Plane
 
-* Worker registration & lifecycle tracking
-* Centralized scheduling
+* Worker registration
+* Scheduling engine
 * Task orchestration
-* Status aggregation
+* Cluster state tracking
 
 ---
 
-### 📡 WebSocket-Based Communication
+### 📡 WebSocket Communication
 
 * Worker ↔ Coordinator messaging
 * Dashboard realtime streaming
@@ -94,28 +161,28 @@ Realtime Dashboard Updates
 
 ---
 
-### ❤️ Self-Healing Worker Model
+### ❤️ Self-Healing Execution
 
-* Worker health tracking
-* Automatic disconnect cleanup
-* Idle/Busy state awareness
+* Worker disconnect cleanup
+* Idle / Busy tracking
+* Continuous monitoring loop
 
 ---
 
 ### 📊 Realtime Observability Dashboard
 
-Live monitoring includes:
+Live monitoring shows:
 
 * Active workers
-* Busy / Idle state
-* Distributed task execution
-* Total tasks processed
+* Execution state
+* Distributed task flow
+* Total processed tasks
 
-Dashboard updates automatically via WebSocket streaming.
+Dashboard updates automatically via WebSockets.
 
 ---
 
-## 🖥️ Realtime Dashboard
+## 🖥️ Dashboard
 
 Open locally:
 
@@ -123,13 +190,7 @@ Open locally:
 http://localhost:3000
 ```
 
-Controls available:
-
-* RUN
-* PAUSE
-* RESUME
-
-No refresh required — live system telemetry.
+Realtime updates — no refresh required.
 
 ---
 
@@ -179,47 +240,30 @@ dashboard/
    index.html         → Realtime Monitoring UI
 
 assets/
-   project screenshots
+   screenshots
 ```
 
 ---
 
-## ⚙️ Installation
+## ▶️ Running the Distributed System
 
-```bash
-npm install
-```
-
-### Dependencies
-
-* playwright
-* ws
-* express
-* chalk
-
----
-
-## ▶️ Running the System
-
-### Start Coordinator
+Coordinator starts orchestration layer:
 
 ```bash
 npm run start:coordinator
 ```
 
-### Start Workers (multiple terminals)
+Workers automatically join cluster:
 
 ```bash
 npm run start:worker
-npm run start:worker
-npm run start:worker
 ```
 
-Workers automatically join the distributed cluster.
+Multiple workers simulate distributed execution.
 
 ---
 
-## 🌐 Example Monitoring Targets
+## 🌐 Monitoring Targets
 
 * Hyperliquid Trading UI
 * GMX Exchange
@@ -231,7 +275,7 @@ Workers continuously navigate and validate live trading interfaces.
 
 ## 🔥 What Makes This Different
 
-This is **NOT** a traditional automation framework.
+This is **NOT a traditional test framework**.
 
 Instead of:
 
@@ -256,7 +300,7 @@ This project demonstrates:
 * Distributed worker cluster
 * Persistent browser agents
 * Scheduler-driven execution
-* WebSocket realtime telemetry
+* WebSocket telemetry
 * Control-plane architecture
 * Infrastructure-style automation
 
@@ -265,10 +309,10 @@ This project demonstrates:
 ## 📈 Future Enhancements
 
 * Worker auto-scaling
-* Persistent task queue
+* Persistent task queues
 * Execution metrics & tracing
 * Docker / Kubernetes deployment
-* AI-assisted planner routing
+* AI planner integration
 * Cloud distributed execution
 
 ---
