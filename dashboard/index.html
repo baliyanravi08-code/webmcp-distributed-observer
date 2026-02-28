@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Distributed Harness</title>
+  <title>Distributed Harness Cluster</title>
 
   <style>
     body {
@@ -11,28 +11,23 @@
       padding:30px;
     }
 
-    button{
-      padding:10px 18px;
-      margin-right:10px;
-      font-size:16px;
-      cursor:pointer;
-    }
-
     #status{
       margin-top:20px;
       background:#222;
       padding:20px;
+    }
+
+    .worker{
+      padding:8px;
+      margin:5px;
+      background:#1e1e1e;
     }
   </style>
 </head>
 
 <body>
 
-<h1>🧠 Distributed Harness (Realtime)</h1>
-
-<button onclick="run()">RUN</button>
-<button onclick="pause()">PAUSE</button>
-<button onclick="resume()">RESUME</button>
+<h1>🧠 Distributed Worker Cluster</h1>
 
 <div id="status">
 Waiting realtime data...
@@ -40,42 +35,49 @@ Waiting realtime data...
 
 <script>
 
-/* ===============================
-   CONNECT DASHBOARD WS
-================================= */
-
 const ws = new WebSocket("ws://localhost:9090");
 
 ws.onopen = () => {
-  console.log("✅ Dashboard WS Connected");
+  console.log("✅ Dashboard Connected");
 };
 
 ws.onerror = () => {
-  console.log("❌ WS ERROR");
-};
-
-ws.onclose = () => {
-  console.log("⚠ WS Closed");
+  console.log("❌ WS Error");
 };
 
 ws.onmessage = (event) => {
 
   const data = JSON.parse(event.data);
 
+  let workerHTML = "";
+
+  data.workers.forEach(w => {
+
+    const color =
+      w.status === "BUSY"
+        ? "#3498db"
+        : "#2ecc71";
+
+    workerHTML += `
+      <div class="worker"
+           style="border-left:6px solid ${color}">
+        👷 Worker-${w.id} — ${w.status}
+      </div>
+    `;
+  });
+
   document.getElementById("status").innerHTML = `
-    <h3>📊 SYSTEM STATUS</h3>
+    <h3>📊 Cluster Status</h3>
 
     Workers Active: ${data.workersActive}<br/>
     Busy: ${data.busy}<br/>
     Idle: ${data.idle}<br/>
     Tasks Sent: ${data.tasksSent}
+
+    <h3>🖥 Worker Nodes</h3>
+    ${workerHTML}
   `;
 };
-
-/* buttons (optional) */
-function run(){}
-function pause(){}
-function resume(){}
 
 </script>
 

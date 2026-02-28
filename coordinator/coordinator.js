@@ -19,104 +19,96 @@ const HTTP_PORT = 3000;
 const workers = new Map();
 let taskCount = 0;
 
-const targets = ["hyperliquid","gmx","uniswap"];
+const targets = ["hyperliquid", "gmx", "uniswap"];
 
-/* =====================================================
-   WORKER SOCKET SERVER
-===================================================== */
+/* ================= WORKER WS ================= */
 
-const workerWSS = new WebSocketServer({
-  port: WORKER_PORT
-});
+const workerWSS = new WebSocketServer({ port: WORKER_PORT });
 
 console.log("🚀 Coordinator started");
 console.log("📡 Worker WS running on 8080");
 
-/* =====================================================
-   DASHBOARD SOCKET SERVER ⭐ IMPORTANT
-===================================================== */
+/* ================= DASHBOARD WS ================= */
 
 const dashboardWSS = new WebSocketServer({
-  port: DASHBOARD_WS_PORT
+  port: DASHBOARD_WS_PORT,
 });
 
 console.log("📊 Dashboard WS running on 9090");
 
-/* =====================================================
-   WORKER CONNECTION
-===================================================== */
+/* ================= WORKER CONNECT ================= */
 
-workerWSS.on("connection",(ws)=>{
+workerWSS.on("connection", (ws) => {
+  const id = Math.floor(Math.random() * 10000);
 
-  const id = Math.floor(Math.random()*10000);
-
-  workers.set(id,{
+  workers.set(id, {
     ws,
-    status:"IDLE"
+    status: "IDLE",
   });
 
   console.log(`✅ Worker-${id} connected`);
 
-  ws.on("message",(msg)=>{
-
+  ws.on("message", (msg) => {
     const data = JSON.parse(msg);
 
-    if(data.type==="STATUS"){
-      workers.get(id).status=data.status;
+    if (data.type === "STATUS") {
+      workers.get(id).status = data.status;
     }
 
-    if(data.type==="TASK_DONE"){
+    if (data.type === "TASK_DONE") {
+      workers.get(id).status = "IDLE";
       console.log(`✅ Worker-${id} finished ${data.task.target}`);
     }
   });
 
-  ws.on("close",()=>{
+  ws.on("close", () => {
     workers.delete(id);
     console.log(`❌ Worker-${id} disconnected`);
   });
 });
 
-/* =====================================================
-   STATUS BROADCAST
-===================================================== */
+/* ================= BROADCAST ================= */
 
-function broadcast(){
+function broadcast() {
+  let busy = 0;
+  let idle = 0;
 
-  let busy=0;
-  let idle=0;
+  const workerList = [];
 
-  workers.forEach(w=>{
-    if(w.status==="BUSY") busy++;
+  workers.forEach((worker, id) => {
+    if (worker.status === "BUSY") busy++;
     else idle++;
+
+    workerList.push({
+      id,
+      status: worker.status,
+    });
   });
 
   const payload = JSON.stringify({
-    workersActive:workers.size,
+    workersActive: workers.size,
     busy,
     idle,
-    tasksSent:taskCount
+    tasksSent: taskCount,
+    workers: workerList,
   });
 
-  dashboardWSS.clients.forEach(client=>{
-    if(client.readyState===1){
+  dashboardWSS.clients.forEach((client) => {
+    if (client.readyState === 1) {
       client.send(payload);
     }
   });
 }
 
-/* =====================================================
-   TASK SCHEDULER
-===================================================== */
+/* ================= TASK SCHEDULER ================= */
 
-setInterval(()=>{
+setInterval(() => {
+  workers.forEach((worker, id) => {
+    if (worker.status === "IDLE" && worker.ws.readyState === 1) {
+      const target =
+        targets[Math.floor(Math.random() * targets.length)];
 
-  workers.forEach((worker,id)=>{
-
-    if(worker.status==="IDLE"
-      && worker.ws.readyState===1){
-
-      const target=
-        targets[Math.floor(Math.random()*targets.length)];
+      worker.status = "BUSY";
 
       taskCount++;
 
@@ -124,35 +116,24 @@ setInterval(()=>{
         `🧠 Task #${taskCount} → ${target} → Worker-${id}`
       );
 
-      worker.ws.send(
-        JSON.stringify({target})
-      );
+      worker.ws.send(JSON.stringify({ target }));
     }
   });
+}, 8000);
 
-},8000);
+/* ================= DASHBOARD UPDATE LOOP ================= */
 
-/* =====================================================
-   DASHBOARD LIVE LOOP ⭐
-===================================================== */
-
-setInterval(()=>{
+setInterval(() => {
   broadcast();
-},2000);
+}, 2000);
 
-/* =====================================================
-   HTTP DASHBOARD
-===================================================== */
+/* ================= HTTP DASHBOARD ================= */
 
-const app=express();
+const app = express();
 
-app.use(
-  express.static(
-    path.join(__dirname,"../dashboard")
-  )
-);
+app.use(express.static(path.join(__dirname, "../dashboard")));
 
-app.listen(HTTP_PORT,()=>{
+app.listen(HTTP_PORT, () => {
   console.log(
     `🌐 Dashboard running at http://localhost:${HTTP_PORT}`
   );

@@ -1,35 +1,18 @@
+![CI](https://github.com/baliyanravi08-code/webmcp-distributed-observer/actions/workflows/node-ci.yml/badge.svg)
+
 # 🧠 WebMCP Distributed Autonomous Web Observability Harness
 
-![Node.js](https://img.shields.io/badge/Node.js-Distributed-green)
-![Playwright](https://img.shields.io/badge/Playwright-Automation-blue)
-![Architecture](https://img.shields.io/badge/Architecture-Control--Plane-orange)
-
-A **distributed, self-healing Playwright automation infrastructure** designed to continuously monitor live web trading interfaces using autonomous browser workers.
-
-This project demonstrates **Automation Infrastructure Engineering**, moving beyond traditional test automation into:
-
-* Distributed orchestration
-* Autonomous browser execution
-* Realtime observability
-* Control-plane driven automation systems
+A **distributed, self-healing Playwright automation infrastructure platform** designed to continuously monitor live web trading interfaces using autonomous browser workers coordinated through a centralized control plane. This project demonstrates modern **Automation Infrastructure Engineering**, transforming traditional UI automation into a distributed observability system powered by autonomous browser agents, realtime WebSocket communication, cluster-based execution, and infrastructure-style orchestration. Instead of running static test suites, the system behaves like a monitoring platform where a coordinator dynamically schedules execution across multiple Playwright workers while streaming live operational telemetry to a realtime dashboard.
 
 ---
 
 ## 🚀 Project Vision
 
-Modern QA platforms should behave like **engineering infrastructure**, not test scripts.
-
-This system implements:
-
-✅ Distributed browser workers
-✅ Centralized control plane
-✅ Autonomous task scheduling
-✅ Live observability dashboard
-✅ Self-healing execution model
+Modern QA automation should operate as **engineering infrastructure**, not isolated scripts. This project implements a platform-level automation architecture capable of distributed browser execution, centralized orchestration, realtime monitoring, and self-healing worker lifecycle management similar to internal automation platforms used in large-scale engineering organizations.
 
 ---
 
-## ⚡ Quick Start (Run Locally)
+## ⚡ Quick Start
 
 Clone repository:
 
@@ -50,26 +33,21 @@ Install Playwright browsers:
 npx playwright install
 ```
 
-Start Coordinator:
+Start coordinator:
 
 ```bash
 npm run start:coordinator
 ```
 
-Start Worker (open new terminal):
-
-```bash
-npm run start:worker
-```
-
-Start additional workers (optional):
+Start worker nodes (multiple terminals recommended):
 
 ```bash
 npm run start:worker
 npm run start:worker
+npm run start:worker
 ```
 
-Open dashboard:
+Open realtime dashboard:
 
 ```
 http://localhost:3000
@@ -83,140 +61,77 @@ http://localhost:3000
 * npm ≥ 9
 * Windows / macOS / Linux
 
-⚠️ Playwright browsers must be installed before running workers.
+⚠ Playwright browsers must be installed before starting workers.
 
 ---
 
-## 🏗️ System Architecture
-
-```
-                    🧠 Planner Engine
-                          │
-                          ▼
-               🚀 Coordinator (Control Plane)
-      ┌──────────────────────────────────────────┐
-      │  Scheduler + Worker Registry             │
-      │  Status Aggregation                      │
-      │  Distributed Task Dispatcher             │
-      └──────────────────────────────────────────┘
-                          │
-              WebSocket Task Distribution
-                          │
-        ┌─────────────────┼─────────────────┐
-        │                 │                 │
-        ▼                 ▼                 ▼
-   👷 Worker-1       👷 Worker-2       👷 Worker-3
-   Playwright        Playwright        Playwright
-   Browser Agent     Browser Agent     Browser Agent
-        │                 │                 │
-        └──────────── UI Monitoring ────────┘
-                          │
-                          ▼
-             📊 Realtime Observability Dashboard
-```
-
----
-
-## ⚙️ Architecture Flow
+## 🏗️ Architecture Overview
 
 ```
 Planner Engine
       ↓
 Coordinator (Control Plane)
       ↓
-Distributed Workers
+Distributed Playwright Workers
       ↓
-Live Browser Monitoring
+Autonomous Browser Monitoring
       ↓
-Realtime Dashboard Updates
+Realtime Observability Dashboard
 ```
 
----
-
-## ⭐ Core Features
-
-### 🧱 Distributed Harness Execution
-
-* Multiple autonomous Playwright workers
-* Horizontal scaling model
-* Persistent single-tab browser agents
-* Independent execution lifecycle
+The coordinator acts as a **control plane**, maintaining worker registry, scheduling monitoring tasks, aggregating execution state, and broadcasting cluster telemetry through WebSockets to the dashboard interface.
 
 ---
 
-### 🧠 Coordinator Control Plane
+## ⭐ Core Capabilities
 
-* Worker registration
-* Scheduling engine
-* Task orchestration
-* Cluster state tracking
-
----
-
-### 📡 WebSocket Communication
-
-* Worker ↔ Coordinator messaging
-* Dashboard realtime streaming
-* Low-latency distributed updates
+* Distributed autonomous browser workers
+* Coordinator-driven task orchestration
+* Worker lifecycle & health tracking
+* Idle/Busy scheduling model
+* Persistent browser execution
+* Realtime observability dashboard
+* WebSocket-based system telemetry
+* Cluster visualization of worker nodes
 
 ---
 
-### ❤️ Self-Healing Execution
+## 📊 Realtime Dashboard
 
-* Worker disconnect cleanup
-* Idle / Busy tracking
-* Continuous monitoring loop
+The dashboard provides live infrastructure visibility including:
 
----
+* Active worker nodes
+* Execution state monitoring
+* Distributed task processing
+* Cluster workload distribution
 
-### 📊 Realtime Observability Dashboard
-
-Live monitoring shows:
-
-* Active workers
-* Execution state
-* Distributed task flow
-* Total processed tasks
-
-Dashboard updates automatically via WebSockets.
-
----
-
-## 🖥️ Dashboard
-
-Open locally:
-
-```
-http://localhost:3000
-```
-
-Realtime updates — no refresh required.
+Updates stream continuously without page refresh.
 
 ---
 
 ## 📸 System Execution
 
-### 📊 Realtime Observability Dashboard
+### Realtime Observability Dashboard
 
 ![Dashboard](assets/realtime-dashboard.png)
 
-### 🚀 Coordinator Distributed Execution
+### Coordinator Distributed Execution
 
 ![Coordinator](assets/coordinator-distributed-execution.png)
 
-### ⚡ Distributed Task Execution
+### Distributed Task Execution
 
 ![Execution](assets/distributed-task-execution.png)
 
-### 👷 Workers Connected
+### Workers Connected
 
 ![Workers](assets/workers-connected.png)
 
-### 🟢 Worker Startup
+### Worker Startup
 
 ![Startup](assets/worker-startup.png)
 
-### 💤 Worker Idle State
+### Worker Idle State
 
 ![Idle](assets/worker-idle-state.png)
 
@@ -225,111 +140,54 @@ Realtime updates — no refresh required.
 ## 📂 Project Structure
 
 ```
-coordinator/
-   coordinator.js     → Control Plane + Scheduler
-
-worker/
-   worker.js          → Distributed Browser Agent
-
-checks/
-   hyperliquid.check.js
-   gmx.check.js
-   uniswap.check.js
-
-dashboard/
-   index.html         → Realtime Monitoring UI
-
-assets/
-   screenshots
+coordinator/   → Control plane & scheduler
+worker/        → Distributed Playwright agents
+checks/        → Monitoring targets
+dashboard/     → Realtime observability UI
+assets/        → Execution screenshots
 ```
 
 ---
 
-## ▶️ Running the Distributed System
+## 🔥 Engineering Differentiation
 
-Coordinator starts orchestration layer:
-
-```bash
-npm run start:coordinator
-```
-
-Workers automatically join cluster:
-
-```bash
-npm run start:worker
-```
-
-Multiple workers simulate distributed execution.
-
----
-
-## 🌐 Monitoring Targets
-
-* Hyperliquid Trading UI
-* GMX Exchange
-* Uniswap Interface
-
-Workers continuously navigate and validate live trading interfaces.
-
----
-
-## 🔥 What Makes This Different
-
-This is **NOT a traditional test framework**.
-
-Instead of:
-
-```
-tests/
-pageObjects/
-specs/
-```
-
-This project demonstrates:
-
-✅ Distributed automation infrastructure
-✅ Autonomous browser agents
-✅ Control-plane orchestration
-✅ Observability-driven QA
-✅ Platform-level automation engineering
+Unlike traditional automation frameworks based on test cases and page objects, this system demonstrates **automation infrastructure design**, focusing on orchestration, distributed execution, observability, and autonomous monitoring workflows.
 
 ---
 
 ## 🧠 Engineering Highlights
 
-* Distributed worker cluster
-* Persistent browser agents
-* Scheduler-driven execution
-* WebSocket telemetry
-* Control-plane architecture
-* Infrastructure-style automation
+* Distributed worker cluster architecture
+* Control-plane orchestration model
+* Realtime WebSocket telemetry
+* Autonomous execution loop
+* Infrastructure-oriented QA automation
+* Cluster-aware dashboard visualization
 
 ---
 
-## 📈 Future Enhancements
+## 📈 Future Scope
 
 * Worker auto-scaling
-* Persistent task queues
-* Execution metrics & tracing
-* Docker / Kubernetes deployment
-* AI planner integration
+* Persistent execution queues
+* Metrics tracing & latency monitoring
+* Containerized deployment
 * Cloud distributed execution
+* AI-assisted planner routing
 
 ---
 
 ## 👨‍💻 Tech Stack
 
-* Playwright
-* Node.js
-* WebSockets
-* Express
-* Distributed System Design
+Playwright • Node.js • WebSockets • Express • Distributed System Design
 
 ---
 
-## ⭐ Positioning
+## ⭐ Release
 
-> **Distributed Autonomous Web Observability Harness**
-> A platform-level QA automation infrastructure inspired by modern control-plane and observability systems.
+**v1.0 — Stable Distributed Automation Infrastructure Release**
 
 ---
+
+> Distributed Autonomous Web Observability Harness
+> Designed as a platform-level QA automation system inspired by modern control-plane and observability architectures.
