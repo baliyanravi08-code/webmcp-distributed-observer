@@ -1,5 +1,3 @@
-![CI](https://github.com/baliyanravi08-code/webmcp-distributed-observer/actions/workflows/node-ci.yml/badge.svg)
-
 # 🧠 WebMCP Distributed Autonomous Web Observability Harness
 
 A **distributed, self-healing Playwright automation infrastructure platform** designed to continuously monitor live web trading interfaces using autonomous browser workers coordinated through a centralized control plane. This project demonstrates modern **Automation Infrastructure Engineering**, transforming traditional UI automation into a distributed observability system powered by autonomous browser agents, realtime WebSocket communication, cluster-based execution, and infrastructure-style orchestration. Instead of running static test suites, the system behaves like a monitoring platform where a coordinator dynamically schedules execution across multiple Playwright workers while streaming live operational telemetry to a realtime dashboard.
