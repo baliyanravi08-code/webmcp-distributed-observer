@@ -74,30 +74,35 @@ function connect() {
 
     console.log("📥 Executing:", task.target);
 
-    try {
+   try {
 
-      if (task.target === "hyperliquid") {
-        await page.goto("https://app.hyperliquid.xyz/", {
-          waitUntil: "domcontentloaded",
-          timeout: 60000
-        });
-      }
+  if (task.target === "hyperliquid") {
+    await page.goto("https://app.hyperliquid.xyz/", {
+      waitUntil: "domcontentloaded",
+      timeout: 60000
+    });
+  }
 
-      if (task.target === "gmx") {
-        await page.goto("https://app.gmx.io/", {
-          waitUntil: "domcontentloaded",
-          timeout: 60000
-        });
-      }
+  if (task.target === "gmx") {
+    await page.goto("https://app.gmx.io/", {
+      waitUntil: "domcontentloaded",
+      timeout: 60000
+    });
+  }
 
-      if (task.target === "uniswap") {
-        await page.goto("https://app.uniswap.org/", {
-          waitUntil: "domcontentloaded",
-          timeout: 60000
-        });
-      }
+  if (task.target === "uniswap") {
+    await page.goto("https://app.uniswap.org/", {
+      waitUntil: "domcontentloaded",
+      timeout: 60000
+    });
+  }
 
-      console.log("✅ Loaded:", task.target);
+  if (task.target === "godark") {
+    const { run } = await import("../checks/godark/health.js");
+    await run(page);
+  }
+
+  console.log("✅ Completed:", task.target);
 
       send({
         type: "TASK_DONE",

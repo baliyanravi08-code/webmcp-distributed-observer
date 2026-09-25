@@ -1,7 +1,7 @@
 // ⭐ Simple Planner Engine
 // Decides which target to monitor next
 
-const targets = ["hyperliquid", "gmx", "uniswap"];
+const targets = ["godark"];
 
 let index = 0;
 
