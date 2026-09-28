@@ -1,85 +1,406 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-  <title>Distributed Harness Cluster</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebMCP Distributed Observer</title>
 
   <style>
+    * { box-sizing: border-box; }
+
     body {
-      background:#0b0b0b;
-      color:white;
-      font-family:Arial;
-      padding:30px;
+      margin: 0;
+      padding: 28px;
+      background: #0b0b0b;
+      color: #ffffff;
+      font-family: Arial, sans-serif;
     }
 
-    #status{
-      margin-top:20px;
-      background:#222;
-      padding:20px;
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
     }
+    .header h1 { margin: 0; font-size: 26px; }
+    .header-subtitle { color: #888; font-size: 13px; margin-top: 6px; }
 
-    .worker{
-      padding:8px;
-      margin:5px;
-      background:#1e1e1e;
+    .live-indicator {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      color: #2ecc71;
+      font-size: 13px;
+      font-weight: bold;
+    }
+    .live-dot { width: 9px; height: 9px; border-radius: 50%; background: #2ecc71; }
+
+    .panel {
+      background: #181818;
+      border: 1px solid #292929;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 18px;
+    }
+    .section-title { font-size: 15px; font-weight: bold; margin-bottom: 14px; }
+
+    /* SUMMARY */
+    .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .summary-card {
+      background: #222222;
+      border: 1px solid #2d2d2d;
+      border-radius: 6px;
+      padding: 16px;
+    }
+    .summary-label { color: #999; font-size: 12px; margin-bottom: 8px; }
+    .summary-value { font-size: 25px; font-weight: bold; }
+
+    /* WORKERS */
+    .worker-list { display: grid; gap: 8px; }
+    .worker {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #222222;
+      border-radius: 5px;
+      padding: 12px 14px;
+      border-left: 5px solid #2ecc71;
+    }
+    .worker-name { font-weight: bold; }
+    .worker-status { font-size: 12px; font-weight: bold; }
+    .worker-busy { color: #3498db; }
+    .worker-idle { color: #2ecc71; }
+
+    /* MONITOR CARDS */
+    .monitor-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .health {
+      background: #222222;
+      border-radius: 6px;
+      padding: 18px;
+      border-left: 5px solid #2ecc71;
+      min-height: 170px;
+      word-break: break-word;
+    }
+    .health-title { font-size: 16px; font-weight: bold; margin-bottom: 14px; }
+    .status { font-weight: bold; margin-bottom: 12px; }
+    .healthy { color: #2ecc71; }
+    .manual { color: #f1c40f; }
+    .failed { color: #e74c3c; }
+    .unavailable { color: #e67e22; }
+    .muted { color: #888; }
+    .metric { margin-top: 8px; color: #bdbdbd; font-size: 13px; }
+    .metric strong { color: #ffffff; }
+
+    /* ACTIVITY */
+    .activity-wrap { overflow-x: auto; }
+    table.activity { width: 100%; border-collapse: collapse; font-size: 13px; }
+    table.activity th {
+      text-align: left;
+      color: #888;
+      font-weight: normal;
+      padding: 6px 10px;
+      border-bottom: 1px solid #2d2d2d;
+    }
+    table.activity td {
+      padding: 8px 10px;
+      border-bottom: 1px solid #222;
+      color: #cfcfcf;
+    }
+    .pill { font-weight: bold; font-size: 12px; }
+
+    /* FOOTER */
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #121212;
+      border: 1px solid #242424;
+      border-radius: 6px;
+      padding: 11px 14px;
+      color: #777;
+      font-size: 12px;
+    }
+    .connected { color: #2ecc71; font-weight: bold; }
+
+    @media (max-width: 850px) {
+      .summary-grid { grid-template-columns: repeat(2, 1fr); }
+      .monitor-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 500px) {
+      body { padding: 15px; }
+      .header { display: block; }
+      .live-indicator { margin-top: 12px; }
+      .summary-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 
 <body>
 
-<h1>🧠 Distributed Worker Cluster</h1>
+  <div class="header">
+    <div>
+      <h1>WebMCP Distributed Observer</h1>
+      <div class="header-subtitle">Distributed monitoring and worker orchestration</div>
+    </div>
+    <div class="live-indicator"><span class="live-dot"></span>REALTIME</div>
+  </div>
 
-<div id="status">
-Waiting realtime data...
-</div>
+  <div id="dashboard">
+    <div class="panel">Waiting for realtime data...</div>
+  </div>
 
-<script>
+  <script>
+    const ws = new WebSocket("ws://localhost:9090");
+    let dashboardConnected = false;
 
-const ws = new WebSocket("ws://localhost:9090");
+    ws.onopen = () => { dashboardConnected = true; console.log("Dashboard connected to coordinator"); };
+    ws.onerror = () => { dashboardConnected = false; };
+    ws.onclose = () => { dashboardConnected = false; console.log("Dashboard disconnected"); };
 
-ws.onopen = () => {
-  console.log("✅ Dashboard Connected");
-};
+    /* ---------- helpers ---------- */
 
-ws.onerror = () => {
-  console.log("❌ WS Error");
-};
+    // Escape text before putting it in innerHTML (error messages come from outside).
+    const esc = (v) =>
+      String(v ?? "").replace(/[&<>"']/g, (c) =>
+        ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])
+      );
 
-ws.onmessage = (event) => {
+    const ms = (v) => (v == null ? null : v + " ms");
 
-  const data = JSON.parse(event.data);
+    const STATUS = {
+      healthy:            { label: "HEALTHY",         color: "#2ecc71", cls: "healthy" },
+      failed:             { label: "FAILED",          color: "#e74c3c", cls: "failed" },
+      unhealthy:          { label: "UNHEALTHY",       color: "#e74c3c", cls: "failed" },
+      blocked:            { label: "BLOCKED",         color: "#f1c40f", cls: "manual" },
+      manual_observation: { label: "MANUAL VERIFIED", color: "#f1c40f", cls: "manual" },
+      unavailable:        { label: "UNAVAILABLE",     color: "#e67e22", cls: "unavailable" }
+    };
 
-  let workerHTML = "";
+    const statusInfo = (s) =>
+      STATUS[String(s || "").toLowerCase()] ||
+      { label: String(s || "UNKNOWN").toUpperCase(), color: "#777", cls: "muted" };
 
-  data.workers.forEach(w => {
+    // Latest result for a target, from whichever worker has one.
+    function findResult(workers, target) {
+      for (const w of workers) {
+        const r = (w.latestResults || {})[target];
+        if (r !== undefined && r !== null) return { result: r, workerId: w.id };
+      }
+      return null;
+    }
 
-    const color =
-      w.status === "BUSY"
-        ? "#3498db"
-        : "#2ecc71";
+    // prep (optional) can adjust a result before it is shown.
+    function card(title, found, describe, prep) {
+      if (!found) {
+        return `
+          <div class="health" style="border-left-color:#777">
+            <div class="health-title">${esc(title)}</div>
+            <div class="muted">Waiting for first result...</div>
+          </div>`;
+      }
 
-    workerHTML += `
-      <div class="worker"
-           style="border-left:6px solid ${color}">
-        👷 Worker-${w.id} — ${w.status}
-      </div>
-    `;
-  });
+      const r = prep ? prep(found.result) : found.result;
+      const s = statusInfo(r.status);
 
-  document.getElementById("status").innerHTML = `
-    <h3>📊 Cluster Status</h3>
+      const rows = describe(r)
+        .filter(([, v]) => v !== undefined && v !== null && v !== "")
+        .map(([k, v]) => `<div class="metric">${esc(k)}: <strong>${esc(v)}</strong></div>`)
+        .join("");
 
-    Workers Active: ${data.workersActive}<br/>
-    Busy: ${data.busy}<br/>
-    Idle: ${data.idle}<br/>
-    Tasks Sent: ${data.tasksSent}
+      return `
+        <div class="health" style="border-left-color:${s.color}">
+          <div class="health-title">${esc(title)}</div>
+          <div class="status ${s.cls}">● ${s.label}</div>
+          ${rows}
+          <div class="metric">Worker: <strong>Worker-${esc(found.workerId)}</strong></div>
+        </div>`;
+    }
 
-    <h3>🖥 Worker Nodes</h3>
-    ${workerHTML}
-  `;
-};
+    const passFail = (v) => (v === undefined ? null : v ? "PASS" : "FAIL");
 
-</script>
+    // One line per sub-check: used by Endpoints, Order Types and Leverage.
+    const checkRows = (r) =>
+      (r.checks || []).map((c) => [
+        c.name,
+        c.ok
+          ? "OK · " + c.ms + " ms" + (c.info ? " · " + c.info : "")
+          : "FAIL · " + c.error
+      ]);
+
+    const describeSystem = (r) => [
+      ["HTTP Status", r.httpStatus],
+      ["Response Time", ms(r.responseTimeMs)],
+      ["Symbols listed", r.data && r.data.symbols ? r.data.symbols.length : null]
+    ];
+
+    const describeApi = (r) => [
+      ["Response Time", ms(r.responseTimeMs)],
+      ["Error", r.error]
+    ];
+
+    const describeTrade = (r) => [
+      ["Order ID", r.orderId],
+      ["Total Time", ms(r.responseTimeMs)],
+      ["Place ack", ms(r.steps && r.steps.placeAckMs)],
+      ["Cancel ack", ms(r.steps && r.steps.cancelAckMs)],
+      ["Error", r.error]
+    ];
+
+    const describeEndpoints = (r) => [
+      ["Passed", r.passed != null ? r.passed + "/" + r.total : null],
+      ...checkRows(r),
+      ["Total Time", ms(r.responseTimeMs)]
+    ];
+
+    const describeOrderTypes = (r) => [
+      ["Passed", r.passed != null ? r.passed + "/" + r.total : null],
+      ...checkRows(r),
+      ["Skipped", r.skipped && r.skipped.length ? r.skipped.join(", ") : null],
+      ["Total Time", ms(r.responseTimeMs)],
+      ["Error", r.error]
+    ];
+
+    // finalLeverage should equal originalLeverage: if not, the restore step failed.
+    const describeLeverage = (r) => [
+      ["Passed", r.passed != null ? r.passed + "/" + r.total : null],
+      ...checkRows(r),
+      ["Symbol", r.symbol],
+      ["Leverage before", r.originalLeverage != null ? r.originalLeverage + "x" : null],
+      ["Leverage after", r.finalLeverage != null ? r.finalLeverage + "x" : null],
+      ["Total Time", ms(r.responseTimeMs)],
+      ["Error", r.error]
+    ];
+
+    const describeUi = (r) => [
+      ["Page", r.title],
+      ["URL", r.url],
+      ["Message", r.message],
+      ["Reason", r.reason],
+      ["Trading screen", passFail(r.checks && r.checks.trading)],
+      ["Balances", passFail(r.checks && r.checks.balances)],
+      ["Account menu", passFail(r.checks && r.checks.accountMenu)]
+    ];
+
+    function logSummary(e) {
+      const d = e.detail || {};
+      return d.error || d.message || (d.responseTimeMs != null ? d.responseTimeMs + " ms" : "");
+    }
+
+    function activityTable(logs) {
+      if (!logs.length) {
+        return `<div class="muted">No completed tasks logged yet.</div>`;
+      }
+
+      const rows = logs
+        .slice()
+        .reverse() // newest first
+        .map((e) => {
+          const s = statusInfo(e.status || (e.event === "error" ? "failed" : ""));
+          const time = e.ts ? new Date(e.ts).toLocaleTimeString() : "";
+          return `
+            <tr>
+              <td>${esc(time)}</td>
+              <td>${esc(e.target)}</td>
+              <td><span class="pill" style="color:${s.color}">${s.label}</span></td>
+              <td>${esc(logSummary(e))}</td>
+            </tr>`;
+        })
+        .join("");
+
+      return `
+        <div class="activity-wrap">
+          <table class="activity">
+            <thead><tr><th>Time</th><th>Target</th><th>Status</th><th>Details</th></tr></thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>`;
+    }
+
+    /* ---------- realtime render ---------- */
+
+    ws.onmessage = (event) => {
+      let data;
+      try {
+        data = JSON.parse(event.data);
+      } catch (error) {
+        console.error("Invalid dashboard data:", error);
+        return;
+      }
+
+      const workers = data.workers || [];
+
+      const workerHTML = workers
+        .map((w) => {
+          const busy = w.status === "BUSY";
+          return `
+            <div class="worker" style="border-left-color:${busy ? "#3498db" : "#2ecc71"}">
+              <div class="worker-name">Worker-${esc(w.id)}</div>
+              <div class="worker-status ${busy ? "worker-busy" : "worker-idle"}">${esc(w.status)}</div>
+            </div>`;
+        })
+        .join("");
+
+      const cards =
+        card("GoDark System Health", findResult(workers, "godark-system-health"), describeSystem) +
+        card("GoDark API Auth", findResult(workers, "godark-api-health"), describeApi) +
+        card("Trade Flow (testnet)", findResult(workers, "godark-trade-flow"), describeTrade) +
+        card("Order Types (testnet)", findResult(workers, "godark-order-types"), describeOrderTypes) +
+        card("Endpoint Checks", findResult(workers, "godark-endpoints"), describeEndpoints) +
+        card("GoDark Trading UI", findResult(workers, "godark"), describeUi);
+
+      document.getElementById("dashboard").innerHTML = `
+
+        <div class="panel">
+          <div class="section-title">Cluster Status</div>
+          <div class="summary-grid">
+            <div class="summary-card">
+              <div class="summary-label">Workers Active</div>
+              <div class="summary-value">${data.workersActive ?? workers.length}</div>
+            </div>
+            <div class="summary-card">
+              <div class="summary-label">Busy Workers</div>
+              <div class="summary-value">${data.busy ?? 0}</div>
+            </div>
+            <div class="summary-card">
+              <div class="summary-label">Idle Workers</div>
+              <div class="summary-value">${data.idle ?? 0}</div>
+            </div>
+            <div class="summary-card">
+              <div class="summary-label">Tasks Sent</div>
+              <div class="summary-value">${data.tasksSent ?? 0}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="section-title">Worker Nodes</div>
+          <div class="worker-list">
+            ${workerHTML || `<div class="muted">No workers connected.</div>`}
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="section-title">Monitored Targets</div>
+          <div class="monitor-grid">${cards}</div>
+        </div>
+
+        <div class="panel">
+          <div class="section-title">Recent Activity</div>
+          ${activityTable(data.recentLogs || [])}
+        </div>
+
+        <div class="footer">
+          <div>
+            Coordinator:
+            <span class="connected">${dashboardConnected ? "CONNECTED" : "DISCONNECTED"}</span>
+          </div>
+          <div>Last update: ${new Date().toLocaleTimeString()}</div>
+        </div>
+      `;
+    };
+  </script>
 
 </body>
+
 </html>

@@ -12,7 +12,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@godark/sdk": "file:sdk/godark-sdk-0.2.0.tgz",
     "chalk": "^5.6.2",
+    "dotenv": "^18.0.3",
     "express": "^5.2.1",
     "playwright": "^1.58.2",
     "ws": "^8.19.0"
